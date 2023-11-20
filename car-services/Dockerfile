@@ -1,4 +1,3 @@
-FROM ubuntu:latest
-LABEL authors="allNewGod"
-
-ENTRYPOINT ["top", "-b"]
+FROM openjdk:17-slim as build
+COPY target/car-services-0.0.1-SNAPSHOT.jar car-services-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java", "-jar", "car-services-0.0.1-SNAPSHOT.jar"]
