@@ -1,0 +1,72 @@
+version: '2.7'
+services:
+  discovery-server:
+    image: hallunal/discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  api-gateway:
+    image: hallunal/api-gateway
+    container_name: api-gateway
+    ports:
+      - "8181:8181"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+    depends_on:
+      - discovery-server
+      - keycloak
+
+  car-services:
+    container_name: car-services
+    image: hallunal/car-services
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - spring.data.mongodb.uri=mongodb://root:root@mongodb:27017/car-service?authSource=admin
+    ports:
+      - "6001:6001"
+    depends_on:
+      - discovery-server
+      - api-gateway
+  rental-services:
+    container_name: rental-services
+    image: hallunal/rental-services
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "6002:6002"
+    depends_on:
+      - discovery-server
+      - api-gateway
+
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    ports:
+     - "8080:8080"
+    mem_limit: 700m
+    environment:
+     KEYCLOAK_ADMIN: admin
+     KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: rental-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345

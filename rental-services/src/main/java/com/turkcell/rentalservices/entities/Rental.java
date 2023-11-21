@@ -2,8 +2,6 @@ package com.turkcell.rentalservices.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-
 import java.time.LocalDate;
 
 @Entity
@@ -14,11 +12,13 @@ import java.time.LocalDate;
 @Builder
 public class Rental {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Integer id;
-    @Column(name = "rentalDate")
-    LocalDate rentalDate;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "rental_date")
+    private LocalDate rentalDate;
+
     @Column(name = "inventory_code")
     private String inventoryCode;
 }
